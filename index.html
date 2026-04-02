@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorry Naina</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -465,7 +466,17 @@
 <body>
     <div class="particles" id="particles"></div>
 
-    <div class="container">
+    <!-- Background apology song -->
+    <audio id="apologySong" autoplay muted loop>
+        <source src="Tenu-Sang-Rakhna-Jigra-Alia-Bhatt-Vedang-Raina-Arijit-Singh-Achint-Anumita-Varun.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div id="soundHint" style="position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: white; padding: 10px 16px; border-radius: 999px; z-index: 10000; font-size:14px;">Tap anywhere to enable sound</div>
+    <div style="position: fixed; bottom: 16px; right: 16px; z-index: 10000;">
+        <button id="playMusic" style="background: #764ba2; color: white; border: none; border-radius: 999px; padding: 10px 16px; cursor: pointer; box-shadow: 0px 10px 20px rgba(0,0,0,0.2);">Play music</button>
+    </div>
+
+    <div class="container"> 
         <div class="heart">💔</div>
         
         <h1>I'm Sorry</h1>
@@ -571,11 +582,91 @@
 
         document.getElementById('acceptBtn').addEventListener('click', function() {
             createConfetti();
-            alert('Thank you for accepting my apology, Naina! 💙');
+            Swal.fire({
+                icon: 'success',
+                title: 'Apology accepted!',
+                text: 'Thank you for accepting my apology, Naina! 💙',
+                timer: 2300,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
         });
 
         document.getElementById('talkBtn').addEventListener('click', function() {
-            alert('I\'m ready to talk whenever you are. I value our conversation. 💬');
+            Swal.fire({
+                title: 'Would you like to call now?',
+                text: 'Click Yes to start a call, or No to just message first.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, call now',
+                cancelButtonText: 'No, message first'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const fixedPhone = '+916377375636';
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Calling Pushpendra',
+                        html: `Dialing <strong>${fixedPhone}</strong>...`,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = 'tel:' + fixedPhone;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Ready to talk',
+                        text: 'Great, I\'m ready to talk when you are. 💬',
+                        timer: 2200,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        const song = document.getElementById('apologySong');
+        const playBtn = document.getElementById('playMusic');
+
+        playBtn.addEventListener('click', () => {
+            song.muted = false;
+            song.volume = 0.5;
+            song.play().then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Song started',
+                    text: 'Now the apology song is playing 🎵',
+                    timer: 1800,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+            }).catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Playback blocked',
+                    text: 'Please interact with the page and try again.',
+                });
+            });
+        });
+
+        window.addEventListener('load', () => {
+            song.muted = true;
+            song.volume = 0.1;
+            song.play().catch(() => {
+                // Autoplay blocked; user gesture required.
+            });
+
+            const soundHint = document.getElementById('soundHint');
+            const enableSound = () => {
+                song.muted = false;
+                song.volume = 0.5;
+                song.play().catch(() => {});
+                soundHint.remove();
+                document.body.removeEventListener('click', enableSound);
+            };
+
+            document.body.addEventListener('click', enableSound, { once: true });
         });
     </script>
 </body>
