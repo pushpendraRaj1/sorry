@@ -625,50 +625,32 @@
         const song = document.getElementById('apologySong');
 
         // The song is started by tapping anywhere on the page via the load event listener below.
-        const songStartSecond = 5;
-        const songSegmentLength = 5; // in seconds
 
-        function setSongSegment(start, length) {
-            const end = start + length;
-
-            const ensureEnd = () => {
-                if (!song.paused && song.currentTime >= end) {
-                    song.pause();
-                    song.removeEventListener('timeupdate', ensureEnd);
-                }
-            };
-
-            song.currentTime = start;
-            song.addEventListener('timeupdate', ensureEnd);
-
-            return end;
-        }
-
-        function startSongSegment() {
+        function startSongFrom(seconds) {
             if (song.readyState >= 1) {
-                setSongSegment(songStartSecond, songSegmentLength);
+                song.currentTime = seconds;
             } else {
                 song.addEventListener('loadedmetadata', function onLoad() {
-                    setSongSegment(songStartSecond, songSegmentLength);
+                    song.currentTime = seconds;
                     song.removeEventListener('loadedmetadata', onLoad);
                 });
             }
-
-            song.play().catch(() => {
-                // Autoplay blocked; user gesture required.
-            });
         }
 
         window.addEventListener('load', () => {
             song.muted = true;
             song.volume = 0.1;
-            startSongSegment();
+            startSongFrom(5);
+            song.play().catch(() => {
+                // Autoplay blocked; user gesture required.
+            });
 
             const soundHint = document.getElementById('soundHint');
             const enableSound = () => {
                 song.muted = false;
                 song.volume = 0.5;
-                startSongSegment();
+                startSongFrom(5);
+                song.play().catch(() => {});
                 soundHint.remove();
                 document.body.removeEventListener('click', enableSound);
             };
