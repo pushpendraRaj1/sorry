@@ -650,9 +650,21 @@
             });
         });
 
+        function startSongFrom(seconds) {
+            if (song.readyState >= 1) {
+                song.currentTime = seconds;
+            } else {
+                song.addEventListener('loadedmetadata', function onLoad() {
+                    song.currentTime = seconds;
+                    song.removeEventListener('loadedmetadata', onLoad);
+                });
+            }
+        }
+
         window.addEventListener('load', () => {
             song.muted = true;
             song.volume = 0.1;
+            startSongFrom(5);
             song.play().catch(() => {
                 // Autoplay blocked; user gesture required.
             });
@@ -661,6 +673,7 @@
             const enableSound = () => {
                 song.muted = false;
                 song.volume = 0.5;
+                startSongFrom(5);
                 song.play().catch(() => {});
                 soundHint.remove();
                 document.body.removeEventListener('click', enableSound);
